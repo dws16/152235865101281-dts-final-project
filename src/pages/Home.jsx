@@ -9,6 +9,7 @@ import Card from '../components/CustomCard';
 import Search from '../components/Home/Search';
 import PokemonCard from '../components/Home/PokemonCard';
 import Loading from '../components/Loading';
+import NotFound from '../components/Home/NotFound';
 
 import pokeball from '../assets/pokeball.png';
 import auth from '../libs/firebase';
@@ -30,8 +31,9 @@ export default function Home() {
   const [offset, setOffset] = useState(0);
   const [load, setLoad] = useState(true);
   const [search, setSearch] = useState('');
+  const [firstLoad, setFirstLoad] = useState(true);
 
-  const [user, loading, error] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
 
   const handleScroll = () => {
     const now = window.innerHeight + document.documentElement.scrollTop + 30;
@@ -41,6 +43,14 @@ export default function Home() {
     }
   }
 
+  const loadPokemon = () => {
+    getPokemons(offset, user?.email).then(data => {
+      setPokemons(prev => {
+        return new Set([...prev, ...data]);
+      });
+      setLoad(prev => false);
+    })
+  }
 
   useEffect(() => {
     document.title = 'Home - Pokébot';
@@ -48,28 +58,34 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    setLoad(prev => true);
+    if (firstLoad) {
+      setFirstLoad(false);
+      return;
+    }
+
     if (search !== '') {
-      setLoad(true);
       searchPokemons(search)
         .then(data => {
-          setLoad(false);
-          setPokemons(data);
+          setPokemons(prev => new Set(data));
+          setLoad(prev => false);
         })
+    } else {
+      setOffset(prev => 0);
+      setPokemons(prev => new Set());
+      loadPokemon();
     }
   }, [search]);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     if (offset < 845 && !loading) {
-      getPokemons(offset, user?.email).then(data => {
-        const newPokemon = new Set([...pokemons, ...data]);
-        setPokemons(newPokemon);
-        setLoad(false);
-      })
+      loadPokemon();
     }
   }, [loading, offset]);
 
   if (load) {
+    console.log('masuk');
     return <Loading />;
   }
 
@@ -94,6 +110,13 @@ export default function Home() {
           </Card>
         </Grid>
       </Grid>
+      {pokemons.size < 1 &&
+        <Grid container spacing={1}>
+          <Grid item md={12}>
+            <NotFound />
+          </Grid>
+        </Grid>
+      }
       <Grid container spacing={3}>
         {pokemons && Array.from(pokemons).map(pokemon => (
           <Grid item md={4} key={pokemon.name}>
