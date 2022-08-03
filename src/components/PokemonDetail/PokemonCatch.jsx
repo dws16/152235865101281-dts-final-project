@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-import { Box, Button, Grid, Typography, Modal, } from "@mui/material";
+import { Box, Button, Grid, Typography, Modal, Skeleton, } from "@mui/material";
 
 import TextField from "../CustomTextFieldDark";
 
@@ -11,6 +11,7 @@ import plus from "../../assets/plus.svg";
 import theme from "../../assets/mui-theme";
 import gotcha from "../../assets/gotcha.png";
 import pawprints from "../../assets/pawprints.png";
+import unknown from "../../assets/unknown-mail.png";
 
 import auth from "../../libs/firebase";
 
@@ -24,6 +25,17 @@ const imgStyle = {
   position: "relative",
   zIndex: "2",
 };
+
+const errorStyle = {
+  maxWidth: "250px",
+  display: "block",
+  marginLeft: "auto",
+  marginRight: "auto",
+  marginBottom: "30px",
+  marginTop: "30px",
+  position: "relative",
+  zIndex: "2",
+}
 
 const dotStyle = {
   position: "absolute",
@@ -68,6 +80,8 @@ const style = {
 export default function PokemonCatch({ pokemonData }) {
   const [open, setOpen] = useState(false);
   const [modal, setModal] = useState(false);
+  const [image, setImage] = useState(false);
+  const [error, setError] = useState(false);
 
   const [user, loading] = useAuthState(auth);
 
@@ -78,6 +92,10 @@ export default function PokemonCatch({ pokemonData }) {
   const catchRate = pokemonData.capture_rate / 255 * 100;
 
   const handleClose = () => setOpen(false);
+
+  const handleLoad = () => setImage(true);
+
+  const handleError = () => setError(true);
 
   const modalLoading = () => (
     <>
@@ -195,7 +213,10 @@ export default function PokemonCatch({ pokemonData }) {
       </Grid>
       <img src={dot} alt="dot" style={dotStyle} />
       <img src={plus} alt="plus" style={plusStyle} />
-      <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonData.id}.png`} style={imgStyle} alt={pokemonData.name} loading="lazy" />
+      {!image &&
+        <Skeleton variant="rectangular" width={240} height={320} style={imgStyle} />
+      }
+      <img src={error ? unknown : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonData.id}.png`} onLoad={handleLoad} onError={handleError} style={error ? errorStyle : imgStyle} alt={pokemonData.name} loading="lazy" />
       <Button variant="contained" color="primary" onClick={handleOpen}><img src={pokeball} style={{ marginLeft: '-35px' }} alt="pokeball" className="pokeball-shake" /> &nbsp;&nbsp;Catch</Button>
 
       <Modal open={open}>
