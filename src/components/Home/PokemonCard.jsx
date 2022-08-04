@@ -5,10 +5,25 @@ import shadowBall from "../../assets/poke-shadow.png";
 import theme from "../../assets/mui-theme";
 import { useAuthState } from "react-firebase-hooks/auth";
 import auth from "../../libs/firebase";
+import { getPokemon } from "../../services/api";
+import { useEffect, useState } from "react";
 
 export default function PokemonCard({ pokemon }) {
 
   const [user, loading, error] = useAuthState(auth);
+  const [load, setLoad] = useState(true);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    if (user && !loading && !error) {
+      getPokemon(user?.email, pokemon.id).then(data => {
+        setTotal(data.pokemon);
+        setLoad(false);
+      }).catch(err => {
+        console.log(err);
+      });
+    }
+  }, [user, loading, error]);
 
   const imgStyle = {
     maxWidth: "150px",
@@ -50,7 +65,7 @@ export default function PokemonCard({ pokemon }) {
         {user?.email && (
           <Card sx={cardStyle}>
             <Typography variant="subtitle2">
-              You Have: {pokemon.have}
+              You Have: {load ? "..." : total}
             </Typography>
           </Card>
         )}

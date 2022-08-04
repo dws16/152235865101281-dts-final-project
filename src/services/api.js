@@ -11,7 +11,7 @@ const storePokemon = async (data) => {
     })
     return response.data
   } catch (err) {
-    return err.response.data;
+    return err;
   }
 }
 
@@ -22,7 +22,7 @@ const getPokemons = async (email, offset = 0) => {
 
     return response.data
   } catch (err) {
-    return err.response.data;
+    return err;
   }
 }
 
@@ -31,7 +31,7 @@ const getPokemon = async (email, pokemon) => {
     const response = await axios.get(`${url}/get/${email}/${pokemon}`)
     return response.data
   } catch (err) {
-    return err.response.data;
+    return err;
   }
 }
 
@@ -40,7 +40,7 @@ const deletePokemon = async (id) => {
     const response = await axios.delete(`${url}/delete/${id}`)
     return response.data
   } catch (err) {
-    return err.response.data;
+    return err;
   }
 }
 
