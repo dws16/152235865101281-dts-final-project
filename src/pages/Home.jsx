@@ -44,7 +44,7 @@ export default function Home() {
   }
 
   const loadPokemon = () => {
-    getPokemons(offset, user?.email).then(data => {
+    getPokemons(offset).then(data => {
       setPokemons(prev => {
         return new Set([...prev, ...data]);
       });
@@ -54,7 +54,6 @@ export default function Home() {
 
   useEffect(() => {
     document.title = 'Home - Pokébot';
-    console.log(loading);
   }, []);
 
   useEffect(() => {
@@ -64,28 +63,27 @@ export default function Home() {
       return;
     }
 
+    setOffset(0);
     if (search !== '') {
       searchPokemons(search)
         .then(data => {
-          setPokemons(prev => new Set(data));
-          setLoad(prev => false);
+          setPokemons(new Set(data));
+          setLoad(false);
         })
     } else {
-      setOffset(prev => 0);
-      setPokemons(prev => new Set());
+      setPokemons(new Set());
       loadPokemon();
     }
   }, [search]);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
-    if (offset < 845 && !loading) {
+    if (offset < 845 && !loading && !search) {
       loadPokemon();
     }
   }, [loading, offset]);
 
   if (load) {
-    console.log('masuk');
     return <Loading />;
   }
 
@@ -110,20 +108,21 @@ export default function Home() {
           </Card>
         </Grid>
       </Grid>
-      {pokemons.size < 1 &&
+      {pokemons.size < 1 ?
         <Grid container spacing={1}>
           <Grid item md={12}>
             <NotFound />
           </Grid>
         </Grid>
+        :
+        <Grid container spacing={3}>
+          {pokemons && Array.from(pokemons).map(pokemon => (
+            <Grid item md={4} key={pokemon.name}>
+              <PokemonCard pokemon={pokemon} />
+            </Grid>
+          ))}
+        </Grid>
       }
-      <Grid container spacing={3}>
-        {pokemons && Array.from(pokemons).map(pokemon => (
-          <Grid item md={4} key={pokemon.name}>
-            <PokemonCard pokemon={pokemon} />
-          </Grid>
-        ))}
-      </Grid>
     </Container>
   );
 }
