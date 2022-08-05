@@ -26,7 +26,7 @@ export default function StatsPanel({ pokemonData }) {
       <Grid container spacing={1} sx={{ marginBottom: 3 }}>
         {pokemonData.stats.map((stat) => (
           <Grid item xs={12} key={stat.stat.name} textAlign="start">
-            <LinearProgressWithLabel label={stat.stat.name.toUpperCase()} value={stat.base_stat / 180 * 100} />
+            <LinearProgressWithLabel label={stat.stat.name.toUpperCase()} value={stat.base_stat / 255 * 100} />
           </Grid>
         ))}
       </Grid>
