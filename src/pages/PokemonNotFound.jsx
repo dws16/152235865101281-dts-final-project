@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import Card from '../components/CustomCard';
 
 import snorlax from '../assets/snorlax.png';
-import { Button, Grid } from '@mui/material';
+import { Button, Container, Grid } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 const style = {
@@ -18,7 +18,7 @@ const style = {
 
 export default function NoMatch() {
   return (
-    <>
+    <Container>
       <Card sx={{ padding: '0.1rem 4rem' }}>
         <Box my={4}>
           <img src={snorlax} style={style} />
@@ -48,6 +48,6 @@ export default function NoMatch() {
           </Grid>
         </Box>
       </Card>
-    </>
+    </Container>
   );
 };
